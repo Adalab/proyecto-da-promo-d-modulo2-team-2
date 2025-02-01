@@ -1,1 +1,1 @@
-# -proyecto-da-promo-d-modulo2-team-2
+# proyecto-da-promo-d-modulo2-team-2
