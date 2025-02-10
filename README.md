@@ -1,6 +1,8 @@
+# MusicStream
+
 ## Descripción del Proyecto
 
-Este proyecto analiza la popularidad de canciones y álbumes en **MusicStream** desde 2018 hasta 2024. Se extraen datos de **Spotify** y **Last.fm**, almacenándolos en una base de datos para realizar consultas y extraer **insights clave** sobre la evolución de la música en este período.
+Este proyecto analiza la popularidad de canciones y álbumes en **MusicStream** desde 2018 hasta 2022. Se extraen datos de **Spotify** y **Last.fm**, almacenándolos en una base de datos para realizar consultas y extraer **insights clave** sobre la evolución de la música en este período.
 
 El objetivo principal es identificar tendencias musicales a lo largo de estos años, incluyendo los efectos de la pandemia en la industria musical y la evolución de los géneros más populares.
 

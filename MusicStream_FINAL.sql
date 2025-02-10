@@ -7,17 +7,29 @@ USE MusicStream;
 SELECT * FROM Spotify;
 SELECT * FROM LastFM; 
 
--- Géneros musicales más popularessegún el número de reproducciones  
 
+ -- Géneros musicales más populares según el género:
+ 
+ /* 
+ Esta consulta tuvo cierta dificultad porque comprobamos que en LastFM había varios registros para el mismo artista y
+ en Spotify había varios géneros para el mismo artista. Hubo que encontrar la forma de que no duplicara la información de las reproducciones y
+ lo resolvimos con un MAX(Playcount) para LastFM y con un MIN(Genre) para Spotify y agrupando por artista en ambos casos.
+ En LastFM:Elige mayor Playcount por artista y agrupa por artista para evitar que un artista con múltiples registros se duplique en el JOIN.
+ En Spotify si un artista tiene varios géneros tomamos el primero en orden alfabético y se agrupa por artista para evitar que un artista aparezca varias veces
+ con distintos géneros.
+ */
+ 
 SELECT 
     s.Genre, 
     SUM(l.Playcount) AS Total_Playcount
 FROM (
+    -- Eliminamos duplicados en LastFM, asegurándonos que cada artista tenga solo un Playcount
     SELECT Artist, MAX(Playcount) AS Playcount
     FROM LastFM
     GROUP BY Artist
 ) l
 INNER JOIN (
+    -- Eliminamos duplicados en Spotify, asegurando que cada artista tenga sólo un género. El MIN elige un único genero por artista
     SELECT Artist, MIN(Genre) AS Genre
     FROM Spotify
     GROUP BY Artist
@@ -25,7 +37,8 @@ INNER JOIN (
 GROUP BY s.Genre
 ORDER BY Total_Playcount DESC;
 
--- Los 10 artistas más escuchados
+
+-- Los 10 artistas más escuchados:
 
 SELECT 
     s.Artist, 
@@ -37,17 +50,20 @@ GROUP BY s.Artist, s.Genre
 ORDER BY Total_Playcount DESC
 LIMIT 10;
 
+
 -- Géneros con más oyentes:
 
 SELECT 
     s.Genre, 
     SUM(l.Listeners) AS Total_Listeners
 FROM (
+    -- Eliminamos duplicados en LastFM, asegurándonos que cada artista tenga solo un Listeners
     SELECT Artist, MAX(Listeners) AS Listeners
     FROM LastFM
     GROUP BY Artist
 ) l
 INNER JOIN (
+    -- Eliminamos duplicados en Spotify, asegurándonos que cada artista tenga sólo un género. El MIN elige un único género por artista.
     SELECT DISTINCT Artist, MIN(Genre) AS Genre
     FROM Spotify
     GROUP BY Artist
@@ -55,7 +71,8 @@ INNER JOIN (
 GROUP BY s.Genre
 ORDER BY Total_Listeners DESC;
 
--- Los 10 artistas con más oyentes
+
+-- Los 10 artistas con más oyentes:
 
 SELECT 
     s.Artist, 
@@ -67,12 +84,13 @@ GROUP BY s.Artist, s.Genre
 ORDER BY Listeners DESC
 LIMIT 10;
 
+
 -- ¿Cuál fue el género con más canciones lanzadas por año?
 
 SELECT 
     s.Year, 
     s.Genre, 
-    COUNT(DISTINCT s.Track, s.Artist) AS Total_tracks 
+    COUNT(DISTINCT s.Track, s.Artist) AS Total_tracks # eliminando posibles duplicados
 FROM Spotify s
 GROUP BY s.Year, s.Genre
 HAVING COUNT(DISTINCT s.Track, s.Artist) = (
@@ -85,12 +103,12 @@ HAVING COUNT(DISTINCT s.Track, s.Artist) = (
         FROM Spotify s2
         GROUP BY s2.Year, s2.Genre
     ) AS Genres_count
-    WHERE Genres_count.Year = s.Year 
+    WHERE Genres_count.Year = s.Year # esto asegura que la comparación se haga año por año
 )
 ORDER BY s.Year ASC;
 
 
--- Evolución del lanzamiento de canciones por año.
+-- Evolución del lanzamiento de canciones por año:
 
 SELECT
 	Year,
@@ -99,7 +117,8 @@ FROM Spotify
 GROUP BY Year
 ORDER BY Year ASC;
 
--- Y si queremos que nos lo muestre por género y año.
+
+-- Y si queremos que nos lo muestre por género y año:
 
 SELECT 
     Year,
@@ -108,6 +127,7 @@ SELECT
 FROM Spotify 
 GROUP BY Year, Genre
 ORDER BY Year ASC, Total_tracks DESC;
+
 
 -- ¿Qué artista sacó más canciones durante la pandemia?
 
@@ -120,6 +140,7 @@ GROUP BY Artist
 ORDER BY Total_tracks DESC
 LIMIT 1;
 
+
 # Con respecto a la consulta anterior, ¿cuáles fueron esas canciones?
 
 SELECT
@@ -129,12 +150,13 @@ FROM Spotify
 WHERE Year = 2020
 AND Artist =  "Bad Bunny";
 
+
 -- ¿Cuál fue el género con más álbumes lanzados por año?
 
 SELECT 
     s.Year, 
     s.Genre, 
-    COUNT(DISTINCT s.Album) AS Total_albums 
+    COUNT(DISTINCT s.Album) AS Total_albums # nos quita los álbumes duplicados
 FROM Spotify s
 GROUP BY s.Year, s.Genre
 HAVING COUNT(DISTINCT s.Album) = (
@@ -147,11 +169,12 @@ HAVING COUNT(DISTINCT s.Album) = (
         FROM Spotify s2
         GROUP BY s2.Year, s2.Genre
     ) AS Genres_count
-    WHERE Genres_count.Year = s.Year 
+    WHERE Genres_count.Year = s.Year # esto asegura que la comparación se haga año por año
 )
 ORDER BY s.Year ASC;
 
--- Evolución del lanzamiento de álbumes por año.
+
+-- Evolución del lanzamiento de álbumes por año:
 
 SELECT
 	Year,
@@ -160,7 +183,8 @@ FROM Spotify
 GROUP BY Year
 ORDER BY Year ASC;
 
--- Y si queremos que nos lo muestre por género y año.
+
+-- Y si queremos que nos lo muestre por género y año:
 
 SELECT 
     Year,
@@ -169,6 +193,7 @@ SELECT
 FROM Spotify
 GROUP BY Year, Genre
 ORDER BY Year ASC, Total_albums DESC;
+
 
 -- ¿Qué artista sacó más álbumes durante la pandemia?
 
@@ -181,6 +206,7 @@ GROUP BY Artist
 ORDER BY Total_albums DESC
 LIMIT 1;
 
+
 # Con respecto a la consulta anterior, ¿cuáles fueron esos álbumes?
 
 SELECT
@@ -189,6 +215,7 @@ SELECT
 FROM Spotify
 WHERE Year = 2020
 AND Artist =  "Myke Towers";
+
 
 -- Evolución de colaboraciones por género:
 
@@ -200,6 +227,7 @@ AND (Track LIKE '%feat%'
      OR Track LIKE '%Ft.%')
 GROUP BY Genre
 ORDER BY Total_Colaboraciones DESC;
+
 
 -- Evolución de colaboraciones por año:
 
@@ -213,6 +241,7 @@ AND (Track LIKE '%feat%'
      OR Track LIKE '%Ft.%')
 GROUP BY Year
 ORDER BY Year ASC;
+
 
 -- Evolución de las colaboraciones por género y año:
 
@@ -228,7 +257,9 @@ AND (Track LIKE '%feat%'
 GROUP BY year, Genre
 ORDER BY year ASC, Num_colaboraciones DESC;
 
+
 -- ¿Cuantos artistas han realizado colaboraciones?
+
 SELECT 
     COUNT(DISTINCT Artist) AS total_artistas_con_colaboraciones
 FROM Spotify
@@ -236,7 +267,9 @@ WHERE
     (Track IS NOT NULL) AND 
     (Track LIKE '%feat%' OR Track LIKE '%with%' OR Track LIKE '%Ft.%');
 
+
 -- Y si quiero saber cuantos artistas tienen mas de una colaboración y cuantas colaboraciones han hecho:
+
 SELECT 
     COUNT(Artist) AS total_artistas_con_colaboraciones,
     SUM(total_colaboraciones) AS total_colaboraciones
@@ -252,7 +285,8 @@ FROM (
     HAVING COUNT(*) > 1
 ) AS artistas_con_colaboraciones;
 
--- artistas con mas de dos colaboraciones:
+
+-- Artistas con más de dos colaboraciones:
 
 SELECT 
     Artist, 
@@ -264,5 +298,3 @@ WHERE
 GROUP BY Artist
 HAVING COUNT(*) > 2
 ORDER BY total_colaboraciones DESC;
-
-
