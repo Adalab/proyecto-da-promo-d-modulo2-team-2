@@ -11,7 +11,7 @@ SELECT * FROM LastFM;
  -- Géneros musicales más populares según el género:
  
  /* 
- Esta consulta tuvo cierta dificultad porque comprobamos que en LastFM había varios registros para el mismo artista y
+ Esta consulta supuso un reto porque comprobamos que en LastFM había varios registros para el mismo artista y
  en Spotify había varios géneros para el mismo artista. Hubo que encontrar la forma de que no duplicara la información de las reproducciones y
  lo resolvimos con un MAX(Playcount) para LastFM y con un MIN(Genre) para Spotify y agrupando por artista en ambos casos.
  En LastFM:Elige mayor Playcount por artista y agrupa por artista para evitar que un artista con múltiples registros se duplique en el JOIN.
@@ -38,7 +38,9 @@ GROUP BY s.Genre
 ORDER BY Total_Playcount DESC;
 
 
--- Los 10 artistas más escuchados:
+-- Los 9 artistas más escuchados:
+# Esta consulta nos devolverá 10 resultados, pero esto es debido a que el artista "Drake" se duplica, inevitablemente, al
+# estar categorizado en Spotify en dos categorías de género diferentes: Pop y Rap
 
 SELECT 
     s.Artist, 
@@ -72,7 +74,9 @@ GROUP BY s.Genre
 ORDER BY Total_Listeners DESC;
 
 
--- Los 10 artistas con más oyentes:
+-- Los 9 artistas con más oyentes:
+# Esta consulta nos devolverá 10 resultados, pero esto es debido a que el artista "Drake" se duplica, inevitablemente, al
+# estar categorizado en Spotify en dos categorías de género diferentes: Pop y Rap
 
 SELECT 
     s.Artist, 
